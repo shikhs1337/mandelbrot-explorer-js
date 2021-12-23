@@ -1,28 +1,31 @@
-const palette = [{'r': 139, 'g': 201, 'b':217}, {'r': 25, 'g': 70, 'b':133}, {'r': 1, 'g': 114, 'b':189}, {'r': 215, 'g': 178, 'b':151}, 
-                 {'r': 230, 'g': 207, 'b':184}, {'r': 36, 'g': 160, 'b':216}, {'r': 249, 'g': 227, 'b':148}, {'r': 249, 'g': 212, 'b':118},
-                 {'r': 255, 'g': 189, 'b':189}, {'r': 255, 'g': 209, 'b':221}, {'r': 255, 'g': 228, 'b':232}, {'r': 255, 'g': 236, 'b':161}, 
-                 {'r': 50, 'g': 165, 'b':141}, {'r': 23, 'g': 48, 'b':88}, {'r': 121, 'g': 128, 'b':199}, {'r': 219, 'g': 158, 'b':210}];
-
+const palette = [];
+const hexCodes = ['#845ec2', '#4e8397', '#d5cabd'];
 
 document.addEventListener("DOMContentLoaded", function() {
+    for(let color of hexCodes){
+        palette.push(getRGB(color));
+    }
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const zoomOutButton = document.getElementById('zoom-out');
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     //Preparatory data for initial render.
     const screenWidth=canvas.scrollWidth;
     const screenHeight=canvas.scrollHeight;
-    const maxIterations=1024;
-    const zoomFactor=5.2;
+    const maxIterations=256;
+    const zoomFactor=5;
     let cartesianWidth=4;
     let cartesianHeight=4;
     let cartesianCenterX=0;
     let cartesianCenterY=0;
     let xAxisStep = cartesianWidth/screenWidth;
     let yAxisStep = cartesianHeight/screenWidth;
+    let zoomLevel=0;
     draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep,
          maxIterations, ctx);
     canvas.addEventListener("click", function(event){
+        zoomLevel++;
         cartesianCenterX = cartesianCenterX + (xAxisStep*(event.clientX-(screenWidth/2)));
         cartesianCenterY = cartesianCenterY + (yAxisStep*(event.clientY-(screenHeight/2)));
         xAxisStep/=zoomFactor;
@@ -30,10 +33,27 @@ document.addEventListener("DOMContentLoaded", function() {
         draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
             maxIterations, ctx);
     });
+    zoomOutButton.addEventListener("click", function(event){
+        if(zoomLevel>1){
+            xAxisStep*=zoomFactor;
+            yAxisStep*=zoomFactor;
+            draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
+                maxIterations, ctx);
+        }else if(zoomLevel==1){
+            cartesianCenterX=0;
+            cartesianCenterY=0;
+            xAxisStep = cartesianWidth/screenWidth;
+            yAxisStep = cartesianHeight/screenWidth;
+            draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
+                maxIterations, ctx);
+        }
+        zoomLevel = (zoomLevel>0) ? zoomLevel-- : 0;
+    });
 });
 
 function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIterations, canvasCtx){
-    alert("Commence");
+    let loaderElement = document.getElementById('loader');
+    loaderElement.style.display='block';
     let maxMagnitude=4;
     let xnew;
     let ynew;
@@ -57,24 +77,39 @@ function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIter
                 let logZn = Math.log(magnitude)/2;
                 let ns = (Math.log(logZn/(Math.log(2))))/Math.log(2);
                 iterations = 1+iterations-ns;
-                // let hue = 0;
-                // let saturation = 1;
-                let value=iterations/maxIterations;
-                let colorVal = Math.round((palette.length-1)*value);
-                // let rgb = hsv2rgb(hue, saturation, value);
-                canvasCtx.fillStyle = 'rgb('+palette[colorVal].r+', '+palette[colorVal].g+', '+palette[colorVal].b+')';
+                canvasCtx.fillStyle = getColor(palette.length*(iterations/maxIterations),palette);
             }else{
-                canvasCtx.fillStyle = 'rgb(0,0,0)';
+                canvasCtx.fillStyle = 'rgba(220,220,220)';
             }
             canvasCtx.fillRect(px,py,1,1);
         }
     }
-    alert("Fin");
+    loaderElement.style.display='none';
 }
 
-function hsv2rgb(h,s,v) 
-{                              
-  let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);     
-  return [Math.round(f(5)*255),Math.round(255*f(3)),Math.round(255*f(1))];       
+function getColor(h, palette) {
+    let clr1 = Math.floor(h);
+    let t2 = h-clr1;
+    let t1 = 1-t2;
+    clr1 = clr1%palette.length;
+    let clr2 = (clr1+1)%palette.length;
+    let r = Math.round(palette[clr1].r*t1)+Math.round(palette[clr2].r*t2); 
+    let g = Math.round(palette[clr1].g*t1)+Math.round(palette[clr2].g*t2); 
+    let b = Math.round(palette[clr1].b*t1)+Math.round(palette[clr2].b*t2); 
+    return 'rgb('+r+','+g+','+b+')';  
 }   
 
+function getRGB(color){
+    let r,g,b;
+    if(color.length == 7){
+      r = parseInt(color.substr(1,2),16);
+      g = parseInt(color.substr(3,2),16);
+      b = parseInt(color.substr(5,2),16);    
+    } else{
+        r=0;
+        g=0;
+        b=0;
+    }
+    return {'r': r, 'g': g, 'b': b} ;
+      
+}

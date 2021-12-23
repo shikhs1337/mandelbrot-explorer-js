@@ -1,3 +1,32 @@
 body {
     margin: 0;
 }
+
+#canvas {
+    z-index: 1;
+    display: block;
+}
+
+#loaderDiv {
+    top: 0;
+    left: 0;
+    z-index:2;
+    position: absolute;
+}
+
+#loader {
+    top: 50%;
+    left: 50%;
+    z-index:2;
+    position: absolute;
+}
+
+.spinner-3 {
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    background:conic-gradient(#0000 10%,#25b09b);
+    -webkit-mask:radial-gradient(farthest-side,#0000 calc(100% - 8px),#000 0);
+    animation:s3 1s infinite linear;
+}
+@keyframes s3 {to{transform: rotate(1turn)}}

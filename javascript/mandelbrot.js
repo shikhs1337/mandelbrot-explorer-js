@@ -1,5 +1,17 @@
+//Preparatory data for initial render.
 const palette = [];
 const hexCodes = ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#e63946', '#f1faee', '#a8dadc', '#457b9d', '#1d3557'];
+const maxIterations=512;
+const zoomFactor=5;
+const maxMagnitude=4;
+let cartesianWidth=4;
+let cartesianHeight=4;
+let cartesianCenterX=0;
+let cartesianCenterY=0;
+let xAxisStep;
+let yAxisStep;
+let zoomLevel=0;
+
 
 document.addEventListener("DOMContentLoaded", function() {
     for(let color of hexCodes){
@@ -10,50 +22,38 @@ document.addEventListener("DOMContentLoaded", function() {
     const zoomOutButton = document.getElementById('zoom-out');
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
-    //Preparatory data for initial render.
     const screenWidth=canvas.scrollWidth;
     const screenHeight=canvas.scrollHeight;
-    const maxIterations=512;
-    const zoomFactor=5;
-    let cartesianWidth=4;
-    let cartesianHeight=4;
-    let cartesianCenterX=0;
-    let cartesianCenterY=0;
-    let xAxisStep = cartesianWidth/screenWidth;
-    let yAxisStep = cartesianHeight/screenWidth;
-    let zoomLevel=0;
+    xAxisStep = cartesianWidth/screenWidth;
+    yAxisStep = cartesianHeight/screenWidth;
     draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep,
-         maxIterations, ctx);
+         maxIterations, maxMagnitude, ctx);
     canvas.addEventListener("click", function(event){
-        console.log(loaderElement.style);
         zoomLevel++;
         cartesianCenterX = cartesianCenterX + (xAxisStep*(event.clientX-(screenWidth/2)));
         cartesianCenterY = cartesianCenterY + (yAxisStep*(event.clientY-(screenHeight/2)));
         xAxisStep/=zoomFactor;
         yAxisStep/=zoomFactor;
         draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
-            maxIterations, ctx);
+            maxIterations, maxMagnitude, ctx);
     });
     zoomOutButton.addEventListener("click", function(event){
         if(zoomLevel>1){
             xAxisStep*=zoomFactor;
             yAxisStep*=zoomFactor;
-            draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
-                maxIterations, ctx);
         }else if(zoomLevel==1){
             cartesianCenterX=0;
             cartesianCenterY=0;
             xAxisStep = cartesianWidth/screenWidth;
             yAxisStep = cartesianHeight/screenWidth;
-            draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
-                maxIterations, ctx);
         }
+        draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep, 
+            maxIterations, maxMagnitude, ctx);
         zoomLevel = (zoomLevel>0) ? zoomLevel-- : 0;
     });
 });
 
-function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIterations, canvasCtx){
-    let maxMagnitude=4;
+function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIterations, maxMagnitude, canvasCtx){
     let xnew;
     let ynew;
     for(let px=0;px<screenWidth;px++){
@@ -108,6 +108,5 @@ function getRGB(color){
         g=0;
         b=0;
     }
-    return {'r': r, 'g': g, 'b': b} ;
-      
+    return {'r': r, 'g': g, 'b': b} ;     
 }

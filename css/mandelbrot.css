@@ -15,10 +15,7 @@ body {
 }
 
 #loader {
-    top: 50%;
-    left: 50%;
     z-index:2;
-    position: absolute;
 }
 
 .spinner-3 {

@@ -1,5 +1,5 @@
 const palette = [];
-const hexCodes = ['#845ec2', '#4e8397', '#d5cabd'];
+const hexCodes = ['#264653', '#2a9d8f', '#e9c46a', '#f4a261', '#e76f51', '#e63946', '#f1faee', '#a8dadc', '#457b9d', '#1d3557'];
 
 document.addEventListener("DOMContentLoaded", function() {
     for(let color of hexCodes){
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //Preparatory data for initial render.
     const screenWidth=canvas.scrollWidth;
     const screenHeight=canvas.scrollHeight;
-    const maxIterations=256;
+    const maxIterations=512;
     const zoomFactor=5;
     let cartesianWidth=4;
     let cartesianHeight=4;
@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
     draw(screenWidth, screenHeight, cartesianCenterX, cartesianCenterY, xAxisStep, yAxisStep,
          maxIterations, ctx);
     canvas.addEventListener("click", function(event){
+        console.log(loaderElement.style);
         zoomLevel++;
         cartesianCenterX = cartesianCenterX + (xAxisStep*(event.clientX-(screenWidth/2)));
         cartesianCenterY = cartesianCenterY + (yAxisStep*(event.clientY-(screenHeight/2)));
@@ -52,8 +53,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIterations, canvasCtx){
-    let loaderElement = document.getElementById('loader');
-    loaderElement.style.display='block';
     let maxMagnitude=4;
     let xnew;
     let ynew;
@@ -84,7 +83,6 @@ function draw(screenWidth, screenHeight, centerX, centerY, xStep, yStep, maxIter
             canvasCtx.fillRect(px,py,1,1);
         }
     }
-    loaderElement.style.display='none';
 }
 
 function getColor(h, palette) {

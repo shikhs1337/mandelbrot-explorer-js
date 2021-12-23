@@ -4,17 +4,13 @@
         <title>The Mandelbrot Set</title>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="../css/mandelbrot.css"/>
-        <script type="text/javascript" src="https://unpkg.com/gpu.js@2.11.4/dist/gpu-browser.js"></script>
-        <script>
-            const gpu = new GPU();
-        </script>
         <script type="text/javascript" src="../javascript/mandelbrot.js"></script>
     </head>
     <body style="margin:0;">
         <div id="loaderDiv">
             <input id="zoom-out" type="button" value="Zoom Out">
+            <!-- <div class="spinner-3" id="loader"></div> -->
         </div>
-        <div class="spinner-3" id="loader"></div>
         <canvas id="canvas"></canvas>
     </body>
 </html>
